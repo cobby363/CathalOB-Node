@@ -12,6 +12,7 @@ router.get('/', (req, res,next) => {
 router.get('/:id', (req, res, next) => {
   const id = parseInt(req.params.id);
   getMovie(id).then(movie => res.status(200).send(movie));
+  
 });
 
 router.get('/:id/reviews', (req, res, next) => {
