@@ -5,6 +5,8 @@ import bodyParser from 'body-parser';
 import './db';
 import {loadUsers} from './seedData';
 import usersRouter from './api/users';
+import session from 'express-session';
+import authenticate from './authenticate';
 
 dotenv.config();
 
@@ -33,8 +35,17 @@ app.use('/api/movies', moviesRouter);
 
 app.use('/api/users', usersRouter);
 
+app.use(session({
+  secret: 'ilikecake',
+  resave: true,
+  saveUninitialized: true
+}));
+
 app.use(errHandler);
 
 app.listen(port, () => {
   console.info(`Server running at ${port}`);
 });
+
+//update /api/Movie route
+app.use('/api/movies', authenticate, moviesRouter);
