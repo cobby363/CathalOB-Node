@@ -33,7 +33,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 
 app.use(express.static('public'));
-app.use('/api/movies', moviesRouter);
+//app.use('/api/movies', moviesRouter);
 
 app.use('/api/users', usersRouter);
 app.use(passport.initialize());
