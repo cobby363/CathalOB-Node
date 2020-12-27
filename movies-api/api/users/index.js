@@ -12,13 +12,15 @@ router.get('/', (req, res) => {
 
 // Register OR authenticate a user
 router.post('/', async (req, res, next) => {
+  var exp =/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{5,}$/;
+  
   if (!req.body.username || !req.body.password) {
     res.status(401).json({
       success: false,
       msg: 'Please pass username and password.',
     });
   }
-  if (req.query.action === 'register') {
+  if (req.query.action === 'register'&& exp.test(req.body.password)) {
     await User.create(req.body).catch(next);
     res.status(201).json({
       code: 201,
@@ -26,7 +28,7 @@ router.post('/', async (req, res, next) => {
     });
   } else {
     const user = await User.findByUserName(req.body.username).catch(next);
-      if (!user) return res.status(401).json({ code: 401, msg: 'Authentication failed. User not found.' });
+      if (!user) return res.status(401).json({ code: 401, msg: 'Authentication failed. User not found. Or Password not valid' });
       user.comparePassword(req.body.password, (err, isMatch) => {
         if (isMatch && !err) {
           // if user is found and password is right create a token
@@ -58,14 +60,14 @@ router.put('/:id',  (req, res) => {
 });
 
 //Add a favourite. No Error Handling Yet. Can add duplicates too!
-router.post('/:userName/favourites', async (req, res) => {
+router.post('/:userName/favourites', async (req, res, next) => {
   const newFavourite = req.body.id;
   const userName = req.params.userName;
   const movie = await movieModel.findByMovieDBId(newFavourite);
   const user = await User.findByUserName(userName);
   await user.favourites.push(movie._id);
   await user.save(); 
-  res.status(201).json(user); 
+  user => res.status(201).json(user).catch(next);
 });
 
 router.get('/:userName/favourites', (req, res, next) => {
